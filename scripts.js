@@ -1,24 +1,39 @@
-function createBoard(size) {
-    const board = [];
-    for (let i = 0; i < size; i++) {
-        board.push([]);
-        for (let j = 0; j < size; j++) {
-            board[i].push('');
-        }
-    }
-    return board;
-}
+function newGame(boardSize = 3) {
+    const gameBoard = (function (size = boardSize) {
+        const board = [];
 
-function newGame(size = 3) {
-    const board = createBoard(size);
+        for (let i = 0; i < size; i++) {
+            board.push([]);
+            for (let j = 0; j < size; j++) {
+                board[i].push('');
+            }
+        }
+
+        const getBoard = () => board;
+        const getSpace = (row, column) => board[row][column];
+        const updateSpace = (row, column, value) => board[row][column] = value;
+        const reset = () => {
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    board[i][j] = '';
+                }
+            }
+        }
+        return {getBoard, getSpace, updateSpace, reset};
+    })();
+
     let turn = 'X';
 
     const play = (row, column) => {
-        board[row][column] = turn;
+        gameBoard.updateSpace(row, column, turn);
         turn = turn === 'X' ? 'O' : 'X'
     }
 
+    const getBoard = () => gameBoard.getBoard();
     const getTurn = () => turn;
-    const getBoard = () => board;
-    return {play, getTurn, getBoard};
+    const resetGame = () => {
+        gameBoard.reset();
+        turn = 'X';
+    }
+    return {play, getTurn, resetGame, getBoard};
 }
