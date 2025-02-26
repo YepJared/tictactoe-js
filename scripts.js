@@ -1,3 +1,7 @@
+function isEmptySpace(space) {
+    return !(space === 'X' || space === 'O');
+}
+
 function newGame(boardSize = 3) {
     const gameBoard = (function (size = boardSize) {
         const board = [];
@@ -25,8 +29,12 @@ function newGame(boardSize = 3) {
     let turn = 'X';
 
     const play = (row, column) => {
-        gameBoard.updateSpace(row, column, turn);
-        turn = turn === 'X' ? 'O' : 'X'
+        if (isEmptySpace(gameBoard.getSpace(row, column))) {
+            gameBoard.updateSpace(row, column, turn);
+            turn = turn === 'X' ? 'O' : 'X';
+        } else {
+            console.log("Invalid placement. Try again.")
+        }
     }
 
     const getBoard = () => gameBoard.getBoard();
