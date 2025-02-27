@@ -8,9 +8,42 @@ function isOccupiedSpace(space) {
     return (space === 'X' || space === 'O');
 }
 
-function newGame(boardSize = 3) {
-    const gameBoard = (function (size = boardSize) {
+function isVictory(rowStart, rowIncrement, colStart, colIncrement, board, size, turn) {
+    let r = rowStart;
+    let c = colStart;
+
+    while (inputOutOfBounds(r, c, size) === false) {
+        if (board[r][c] != turn) {
+            return false;
+        }
+
+        c += colIncrement;
+        r += rowIncrement;
+    }
+
+    return true;
+}
+
+function victoryAchieved(r, c, board, size, turn) {
+    const rowVictory = isVictory(r, 0, 0, 1, board, size, turn);
+    const colVictory = isVictory(0, 1, c, 0, board, size, turn);
+    let topLeftBottomRightDiagVictory = false;
+    let bottomLeftTopRightDiagVictory = false;
+    if (r === c) {
+        topLeftBottomRightDiagVictory = isVictory(0, 1, 0, 1, board, size, turn);
+    }
+
+    if (r === size - c - 1) {
+        bottomLeftTopRightDiagVictory = isVictory(size - 1, -1, 0, 1, board, size, turn);
+    }
+
+    return rowVictory || colVictory || topLeftBottomRightDiagVictory || bottomLeftTopRightDiagVictory;
+}
+
+const game = (function() {
+    const gameBoard = (function () {
         const board = [];
+        const size = 3;
 
         for (let i = 0; i < size; i++) {
             board.push([]);
@@ -20,7 +53,7 @@ function newGame(boardSize = 3) {
         }
 
         const getBoard = () => board;
-        const getSize = () => board.length;
+        const getSize = () => size;
         const getSpace = (row, column) => board[row][column];
         const updateSpace = (row, column, value) => board[row][column] = value;
         const reset = () => {
@@ -34,8 +67,14 @@ function newGame(boardSize = 3) {
     })();
 
     let turn = 'X';
+    let turnCount = 0;
+    let gameOver = false;
 
     const play = (row, column) => {
+        if (gameOver) {
+            console.log("Game is over. Start a new game.");
+        }
+
         if (inputOutOfBounds(row, column, gameBoard.getSize())) {
             console.log("Invalid input. Try again.");
             return;
@@ -47,6 +86,20 @@ function newGame(boardSize = 3) {
         }
 
         gameBoard.updateSpace(row, column, turn);
+
+        if (victoryAchieved(row, column, gameBoard.getBoard(), gameBoard.getSize(), turn)) {
+            gameOver = true;
+            console.log(`Congratulations! ${turn} wins!`);
+            return;
+        }
+
+        turnCount++;
+        if (turnCount === size * size) {
+            gameOver = true;
+            console.log('Stalemate. Nobody wins.');
+            return;
+        }
+
         turn = turn === 'X' ? 'O' : 'X';
     }
 
@@ -55,6 +108,8 @@ function newGame(boardSize = 3) {
     const resetGame = () => {
         gameBoard.reset();
         turn = 'X';
+        turnCount = 0;
+        gameOver = false;
     }
-    return {play, getTurn, resetGame, getBoard};
-}
+    return {play, getBoard, getTurn, resetGame};
+})();
