@@ -104,6 +104,7 @@ const game = (function() {
     }
 
     const getBoard = () => gameBoard.getBoard();
+    const getBoardSize = () => gameBoard.getSize();
     const getTurn = () => turn;
     const resetGame = () => {
         gameBoard.reset();
@@ -111,5 +112,14 @@ const game = (function() {
         turnCount = 0;
         gameOver = false;
     }
-    return {play, getBoard, getTurn, resetGame};
+    return {play, getBoard, getBoardSize, getTurn, resetGame};
+})();
+
+const displayController = (function() {
+    const boardContainer = document.querySelector(".gameboard");
+    for (let i = 0; i < game.getBoardSize() ** 2; i++) {
+        const button = document.createElement("button");
+        button.classList.add("space");
+        boardContainer.appendChild(button);
+    }
 })();
