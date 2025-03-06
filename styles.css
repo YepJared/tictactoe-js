@@ -92,7 +92,9 @@ button {
 .space {
     background-color: white;
     border-radius: 0;
+    font-size: 6vw;
 }
+
 
 .new-game {
     align-self: center;

@@ -55,7 +55,10 @@ const game = (function() {
         const getBoard = () => board;
         const getSize = () => size;
         const getSpace = (row, column) => board[row][column];
-        const updateSpace = (row, column, value) => board[row][column] = value;
+        const updateSpace = (row, column, value) => {
+            board[row][column] = value;
+            displayController.updateDisplay(row, column, value);
+        }
         const reset = () => {
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
@@ -73,6 +76,7 @@ const game = (function() {
     const play = (row, column) => {
         if (gameOver) {
             console.log("Game is over. Start a new game.");
+            return;
         }
 
         if (inputOutOfBounds(row, column, gameBoard.getSize())) {
@@ -94,7 +98,7 @@ const game = (function() {
         }
 
         turnCount++;
-        if (turnCount === size * size) {
+        if (turnCount === game.getBoardSize() ** 2) {
             gameOver = true;
             console.log('Stalemate. Nobody wins.');
             return;
@@ -115,11 +119,43 @@ const game = (function() {
     return {play, getBoard, getBoardSize, getTurn, resetGame};
 })();
 
+/* 
+Assuming the tic tac toe board spaces are numbered starting from the top-left
+and that the spaces start being numbered at 0 increasing by one as you move left to right
+any given space's id can be given by the formula id = (boardSize * row) + column
+*/
+
+function getRowColFromID(id, size) {
+    const column = id % size;
+    const row = (id - column) / size;
+    return {
+        row: row,
+        column: column
+    };
+}
+
+function getIDFromRowCol(row, col, size) {
+    return size * row + col;
+}
+
 const displayController = (function() {
     const boardContainer = document.querySelector(".gameboard");
     for (let i = 0; i < game.getBoardSize() ** 2; i++) {
         const button = document.createElement("button");
         button.classList.add("space");
+        button.id = i;
+        button.addEventListener("click", () => {
+            const space = getRowColFromID(button.id, game.getBoardSize());
+            game.play(space.row, space.column);
+        });
         boardContainer.appendChild(button);
     }
+
+    const updateDisplay = (row, column, turn) => {
+        const buttonID = getIDFromRowCol(row, column, game.getBoardSize());
+        const button = document.getElementById(`${buttonID}`);
+        button.textContent = turn;
+    }
+
+    return {updateDisplay};
 })();
