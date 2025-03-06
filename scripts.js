@@ -40,6 +40,12 @@ function victoryAchieved(r, c, board, size, turn) {
     return rowVictory || colVictory || topLeftBottomRightDiagVictory || bottomLeftTopRightDiagVictory;
 }
 
+function changeTurn(turn) {
+    const newTurn = turn === 'X' ? 'O' : 'X';
+    displayController.updateTurn(newTurn);
+    return newTurn;
+}
+
 const game = (function() {
     const gameBoard = (function () {
         const board = [];
@@ -63,6 +69,7 @@ const game = (function() {
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
                     board[i][j] = '';
+                    displayController.updateDisplay(i, j, '');
                 }
             }
         }
@@ -104,7 +111,7 @@ const game = (function() {
             return;
         }
 
-        turn = turn === 'X' ? 'O' : 'X';
+        turn = changeTurn(turn);
     }
 
     const getBoard = () => gameBoard.getBoard();
@@ -112,7 +119,7 @@ const game = (function() {
     const getTurn = () => turn;
     const resetGame = () => {
         gameBoard.reset();
-        turn = 'X';
+        turn = changeTurn('O');
         turnCount = 0;
         gameOver = false;
     }
@@ -151,11 +158,20 @@ const displayController = (function() {
         boardContainer.appendChild(button);
     }
 
+    const turnIndicator = document.querySelector(".turn");
+    turnIndicator.textContent = 'X';
+    turnIndicator.style.color = "darkred";
+
     const updateDisplay = (row, column, turn) => {
         const buttonID = getIDFromRowCol(row, column, game.getBoardSize());
         const button = document.getElementById(`${buttonID}`);
         button.textContent = turn;
     }
 
-    return {updateDisplay};
+    const updateTurn = (turn) => {
+        turnIndicator.textContent = turn;
+        turnIndicator.style.color = turn === 'X' ? "darkred" : "darkblue";
+    }
+
+    return {updateDisplay, updateTurn};
 })();

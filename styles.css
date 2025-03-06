@@ -95,8 +95,17 @@ button {
     font-size: 6vw;
 }
 
+.turn-display {
+    display: flex;
+    justify-content: center;
+    gap: 1ch;
+    font-size: 1.5em;
+    margin: 12px;
+}
+
 
 .new-game {
     align-self: center;
-    margin: 12px 0;
+    border: solid black 4px;
+    font-weight: bold;
 }
